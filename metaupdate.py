@@ -16,12 +16,34 @@ def data_request():
 
 # parse Vicious Syndicate data
 def parse_data(html):
-    soup = html
 
-    rows = soup.find_all('tr')
+    # import data, seperate table rows
+    soup = html
+    body = soup.find('tbody')
+    rows = body.find_all('tr')
+
+    rowcount = 0
+    topclasses = []
+
     for row in rows:
-        print('------')
-        print(row) 
+        if rowcount == 0: # get top classes and latest update time from first row 
+            cols = row.find_all('td')
+            for col in cols:
+                data = col.get_text()        
+                if data != "":
+                    if data[0].isdigit():
+                        time = data
+                    else:
+                        topclasses.append(data)
+        else:
+            cols = row.find_all('td')
+            for col in cols:
+                data = col.get_text()
+                if data != "":
+                    print(data)
+ 
+        rowcount += 1
+
 
 def main():
 
