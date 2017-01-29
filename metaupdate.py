@@ -23,9 +23,14 @@ def parse_data(html):
     rows = body.find_all('tr')
 
     rowcount = 0
-    topclasses = []
+    topdecks = []
+    matchups = []
 
     for row in rows:
+
+        rates = []
+        deck = ""
+
         if rowcount == 0: # get top classes and latest update time from first row 
             cols = row.find_all('td')
             for col in cols:
@@ -34,14 +39,21 @@ def parse_data(html):
                     if data[0].isdigit():
                         time = data
                     else:
-                        topclasses.append(data)
-        else:
+                        topdecks.append(data)
+        else: # get deck matchups from remaining rows
             cols = row.find_all('td')
             for col in cols:
                 data = col.get_text()
-                if data != "":
-                    print(data)
- 
+                if data:
+                    if data[0].isdigit():
+                        rates.append(data)
+                    else:
+                        deck = data
+            #debug
+            print(deck)
+            print(topdecks)
+            print(rates)
+            print("---")
         rowcount += 1
 
 
