@@ -69,17 +69,47 @@ def calculate(results):
 
     freq = sorted(results['Frequency'].items(), key=itemgetter(1))
     freq.reverse()
+
+    rec = {}
     for key in freq:
         if key[0] != "Win Rate":
-            print(key[0] + ": " + str(float(key[1]) * 100) + "%")
+            rec[key[0]] = 0
+
+    # Display current deck encounter frequency / matchups
+    print("Current Meta \n")
+    print("Encounters: (Encouter Rate% @ Win Ratio%)\n")
+    for key in freq:
+        if key[0] != "Win Rate":
+            wr = float(results[key[0]]['Win Rate']) * 100
+            er = float(key[1]) * 100
+            print("    " + key[0] + ": " + "{0:.2f}".format(round(er,2)) + "% @ " + "{0:.2f}".format(round(wr,2)) + "%")
+
+    print("\nMatchups")
+    for key in freq:
+        if key[0] != "Win Rate":
+            print("\n    " + key[0])
+            matchups = sorted(results[key[0]].items(), key=itemgetter(1))
+            matchups.reverse()
+            for match in matchups:
+                if match[0] != "Win Rate":
+                    wr = float(match[1]) * 100
+                    print("        " + match[0] + ": " + "{0:.2f}".format(round(wr,2)) + "%")
+                    if ((float(match[1]) * 100) < 50):
+                        rec[match[0]] += 1
+
+    suggested = sorted(rec.items(), key=itemgetter(1))
+    suggested.reverse()
+    print("\nSuggested decks (Based on number of favorable matchups):")
+    for key in suggested:
+        print("    " + key[0] + ": " + str(key[1]))
+
 
 def main():
 
     os.system("clear")
     data = data_request()
     parse = parse_data(data)
-    
-    compiled = calculate(parse)
+    calculate(parse)
 
 if __name__ == "__main__":
     main()
