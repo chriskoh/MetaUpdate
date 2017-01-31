@@ -2,6 +2,7 @@
 
 import requests
 import os
+from operator import itemgetter
 from bs4 import BeautifulSoup
 
 # request Vicious Syndicate data (updated hourly)
@@ -25,11 +26,13 @@ def parse_data(html):
     rowcount = 0
     topdecks = []
     matchups = []
+    results = {}
 
     for row in rows:
 
         rates = []
         deck = ""
+        tempresults = {}
 
         if rowcount == 0: # get top classes and latest update time from first row 
             cols = row.find_all('td')
@@ -49,20 +52,34 @@ def parse_data(html):
                         rates.append(data)
                     else:
                         deck = data
-            #debug
-            print(deck)
-            print(topdecks)
-            print(rates)
-            print("---")
+
+        # sort data in to dict
+        if len(topdecks) == len(rates):
+            
+            for x in range(0,len(topdecks)):
+                tempresults[topdecks[x]] = rates[x]
+            results[deck] = tempresults
         rowcount += 1
 
+    return results
+
+def calculate(results):
+
+    keys = results.keys()
+
+    freq = sorted(results['Frequency'].items(), key=itemgetter(1))
+    freq.reverse()
+    for key in freq:
+        if key[0] != "Win Rate":
+            print(key[0] + ": " + str(float(key[1]) * 100) + "%")
 
 def main():
 
     os.system("clear")
     data = data_request()
     parse = parse_data(data)
-
+    
+    compiled = calculate(parse)
 
 if __name__ == "__main__":
     main()
